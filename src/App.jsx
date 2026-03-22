@@ -1,5 +1,9 @@
 import { useState } from "react";
 
+// วางไฟล์ PDF ในโฟลเดอร์ public/ ด้วยชื่อนี้ (หรือเปลี่ยนชื่อแล้วแก้บรรทัดนี้)
+const PUBLIC_PDF_FILE = "cml-reference.pdf";
+const PUBLIC_PDF_HREF = `${import.meta.env.BASE_URL}${PUBLIC_PDF_FILE}`;
+
 // ─── Modules Menu ──────────────────────
 const MODULES = [
   { id: "response", icon: "📈", label: "qPCR BCR::ABL1", desc: "ประเมินผล & Milestone" },
@@ -10,6 +14,7 @@ const MODULES = [
   { id: "monitoring", icon: "🕐", label: "Milestones", desc: "Timeline 3-6-12 เดือน" },
   { id: "tfr", icon: "🎯", label: "TFR", desc: "หยุดยาได้หรือยัง" },
   { id: "interaction", icon: "⚠️", label: "Drug Interaction", desc: "อาหาร/ยา/สมุนไพร" },
+  { id: "pdf", icon: "📄", label: "เอกสาร PDF", desc: "คู่มือ / guideline (เปิดแท็บใหม่)", href: PUBLIC_PDF_HREF },
 ];
 
 // ─── Response / qPCR Assessment ──────────────────────
@@ -580,7 +585,14 @@ export default function CMLApp() {
   const [active, setActive] = useState(null);
 
   return (
-    <div style={{ fontFamily: "'Sarabun', 'Segoe UI', system-ui, sans-serif", maxWidth: 640, margin: "0 auto" }}>
+    <div style={{
+      fontFamily: "'Sarabun', 'Segoe UI', system-ui, sans-serif",
+      maxWidth: 640,
+      margin: "0 auto",
+      /* ให้รายการสุดท้าย (Drug Interaction) ไม่ถูกแถบนำทาง Android/Chrome บัง */
+      paddingBottom: "calc(72px + env(safe-area-inset-bottom, 0px))",
+      boxSizing: "border-box",
+    }}>
       {/* Header */}
       <div style={{
         background: "linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%)",
@@ -607,20 +619,46 @@ export default function CMLApp() {
               เลือกหัวข้อที่ต้องการ — ไม่จำเป็นต้องเรียงลำดับ
             </p>
             <div style={{ display: "grid", gap: 8 }}>
-              {MODULES.map(m => (
-                <button key={m.id} onClick={() => setActive(m.id)} style={{
+              {MODULES.map((m) => {
+                const menuRowStyle = {
                   display: "flex", alignItems: "center", gap: 12, padding: "14px 16px",
                   background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 10,
                   cursor: "pointer", textAlign: "left", transition: "all 0.12s",
-                }}>
-                  <span style={{ fontSize: 26 }}>{m.icon}</span>
-                  <div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: "#1a365d" }}>{m.label}</div>
-                    <div style={{ fontSize: 12, color: "#a0aec0" }}>{m.desc}</div>
-                  </div>
-                  <span style={{ marginLeft: "auto", color: "#cbd5e0", fontSize: 18 }}>›</span>
-                </button>
-              ))}
+                };
+                if (m.href) {
+                  return (
+                    <a
+                      key={m.id}
+                      href={m.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        ...menuRowStyle,
+                        textDecoration: "none",
+                        color: "inherit",
+                        WebkitTapHighlightColor: "transparent",
+                      }}
+                    >
+                      <span style={{ fontSize: 26 }}>{m.icon}</span>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: 15, fontWeight: 700, color: "#1a365d" }}>{m.label}</div>
+                        <div style={{ fontSize: 12, color: "#a0aec0" }}>{m.desc}</div>
+                      </div>
+                      <span style={{ marginLeft: "auto", color: "#cbd5e0", fontSize: 16, flexShrink: 0 }} aria-hidden>↗</span>
+                    </a>
+                  );
+                }
+                return (
+                  <button key={m.id} type="button" onClick={() => setActive(m.id)} style={menuRowStyle}>
+                    <span style={{ fontSize: 26 }}>{m.icon}</span>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: "#1a365d" }}>{m.label}</div>
+                      <div style={{ fontSize: 12, color: "#a0aec0" }}>{m.desc}</div>
+                    </div>
+                    <span style={{ marginLeft: "auto", color: "#cbd5e0", fontSize: 18 }}>›</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         ) : (
