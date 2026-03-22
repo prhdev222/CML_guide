@@ -1,8 +1,11 @@
 import { useState } from "react";
 
-// วางไฟล์ PDF ในโฟลเดอร์ public/ ด้วยชื่อนี้ (หรือเปลี่ยนชื่อแล้วแก้บรรทัดนี้)
-const PUBLIC_PDF_FILE = "cml-reference.pdf";
-const PUBLIC_PDF_HREF = `${import.meta.env.BASE_URL}${PUBLIC_PDF_FILE}`;
+// ไฟล์ PDF ต้องอยู่ในโฟลเดอร์ public/ — ชื่อต้องตรงกับไฟล์จริง (Vite เสิร์ฟที่ root)
+function publicAssetHref(filename) {
+  const base = import.meta.env.BASE_URL || "/";
+  const path = base.endsWith("/") ? `${base}${filename}` : `${base}/${filename}`;
+  return path;
+}
 
 // ─── Modules Menu ──────────────────────
 const MODULES = [
@@ -14,7 +17,8 @@ const MODULES = [
   { id: "monitoring", icon: "🕐", label: "Milestones", desc: "Timeline 3-6-12 เดือน" },
   { id: "tfr", icon: "🎯", label: "TFR", desc: "หยุดยาได้หรือยัง" },
   { id: "interaction", icon: "⚠️", label: "Drug Interaction", desc: "อาหาร/ยา/สมุนไพร" },
-  { id: "pdf", icon: "📄", label: "เอกสาร PDF", desc: "คู่มือ / guideline (เปิดแท็บใหม่)", href: PUBLIC_PDF_HREF },
+  { id: "pdf-patient", icon: "📄", label: "เอกสารผู้ป่วย (PDF)", desc: "cml-patient.pdf", href: publicAssetHref("cml-patient.pdf") },
+  { id: "pdf-summary", icon: "📋", label: "สรุป CML (PDF)", desc: "cml.pdf", href: publicAssetHref("cml.pdf") },
 ];
 
 // ─── Response / qPCR Assessment ──────────────────────
